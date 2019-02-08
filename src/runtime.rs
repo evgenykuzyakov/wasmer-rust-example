@@ -9,7 +9,7 @@ pub struct Runtime {
 }
 
 impl Runtime {
-    fn print_str(&self, _ptr: u32, _len: u32, _aaa: i32) -> StrResult<()> {
+    fn print_str(&self, _ptr: u32, _len: u32, _aaa: i32) -> () {
         // Get a slice that maps to the memory currently used by the webassembly
         // instance.
         //
@@ -31,10 +31,9 @@ impl Runtime {
         // println!("a {}", aaa);
         // println!("self.total_gas {}", self.total_gas);
         // println!("self.gas_limit {}", self.gas_limit);
-        Ok(())
     }
 
-    fn gas(&mut self, added_gas: u32) -> StrResult<()> {
+    fn gas(&mut self, added_gas: u32) -> () {
         let prev = self.total_gas;
         let gas_amount = u64::from(added_gas);
         let res = match prev.checked_add(gas_amount) {
@@ -47,9 +46,11 @@ impl Runtime {
             }
         };
         if !res {
-            Err("NO gassss".to_string())
+            println!("NO gassss");
+            // Err("NO gassss".to_string())
         } else {
-            Ok(())
+            ()
+//            Ok(())
         }
     }
 }
@@ -68,7 +69,7 @@ pub(crate) mod imports {
     macro_rules! wrapped_imports {
         ( $( $import_name:expr => $func_name:ident < [ $( $arg_name:ident : $arg_type:ident ),* ] -> [ $( $returns:ident ),* ] >, )* ) => {
             $(
-                fn $func_name( $( $arg_name: $arg_type, )* ctx: &mut Ctx) -> StrResult<($( $returns )*)> {
+                fn $func_name( $( $arg_name: $arg_type, )* ctx: &mut Ctx) -> ($( $returns )*) {
                     let runtime: &mut Runtime = unsafe { &mut *(ctx.data as *mut Runtime) };
                     runtime.$func_name( $( $arg_name, )* )
                 }
