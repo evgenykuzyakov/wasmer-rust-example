@@ -1,7 +1,5 @@
 use std::str;
 
-type StrResult<T> = Result<T, String>;
-
 pub struct Runtime {
     pub a: u32,
     pub total_gas: u64,
@@ -9,7 +7,7 @@ pub struct Runtime {
 }
 
 impl Runtime {
-    fn print_str(&self, _ptr: u32, _len: u32, _aaa: i32) -> StrResult<()> {
+    fn print_str(&self, ptr: u32, len: u32, aaa: i32) {
         // Get a slice that maps to the memory currently used by the webassembly
         // instance.
         //
@@ -23,7 +21,7 @@ impl Runtime {
         let str_slice = b"hello";
 
         // Convert the subslice to a `&str`.
-        let _string = str::from_utf8(str_slice).unwrap();
+        let string = str::from_utf8(str_slice).unwrap();
 
         // Print it!
         // println!("{}", string);
@@ -31,10 +29,9 @@ impl Runtime {
         // println!("a {}", aaa);
         // println!("self.total_gas {}", self.total_gas);
         // println!("self.gas_limit {}", self.gas_limit);
-        Ok(())
     }
 
-    fn gas(&mut self, added_gas: u32) -> StrResult<()> {
+    fn gas(&mut self, added_gas: u32) {
         let prev = self.total_gas;
         let gas_amount = u64::from(added_gas);
         let res = match prev.checked_add(gas_amount) {
@@ -47,30 +44,27 @@ impl Runtime {
             }
         };
         if !res {
-            Err("NO gassss".to_string())
-        } else {
-            Ok(())
+            println!("NO gassss");
         }
     }
 }
 
 
 pub(crate) mod imports {
-    use super::{Runtime, StrResult};
+    use super::Runtime;
 
     use wasmer_runtime::{
         imports,
-        func,
         ImportObject,
         Ctx,
     };
 
     macro_rules! wrapped_imports {
-        ( $( $import_name:expr => $func_name:ident < [ $( $arg_name:ident : $arg_type:ident ),* ] -> [ $( $returns:ident ),* ] >, )* ) => {
+        ( $( $import_name:expr => $func:ident < [ $( $arg_name:ident : $arg_type:ident ),* ] -> [ $( $returns:ident ),* ] >, )* ) => {
             $(
-                fn $func_name( $( $arg_name: $arg_type, )* ctx: &mut Ctx) -> StrResult<($( $returns )*)> {
+                extern fn $func( $( $arg_name: $arg_type, )* ctx: &mut Ctx) -> ($( $returns )*) {
                     let runtime: &mut Runtime = unsafe { &mut *(ctx.data as *mut Runtime) };
-                    runtime.$func_name( $( $arg_name, )* )
+                    runtime.$func( $( $arg_name, )* )
                 }
             )*
 
@@ -78,7 +72,7 @@ pub(crate) mod imports {
                 imports! {
                     "env" => {
                         $(
-                            $import_name => func!($func_name),
+                            $import_name => $func<[ $( $arg_type ),* ] -> [$( $returns )*]>,
                         )*
                     },
                 }

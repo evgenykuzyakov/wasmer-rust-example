@@ -20,12 +20,12 @@ fn run(n: u32) ->  error::Result<Vec<Value>> {
     let import_object = imports::build();
 
     // Compile our webassembly into an `Instance`.
-    let mut instance = instantiate(WASM, &import_object)?;
+    let mut instance = instantiate(WASM, import_object)?;
 
     instance.context_mut().data = &mut runtime as *mut _ as *mut c_void;
 
     // Call our exported function!
-    instance.call("hello_wasm", &[Value::I32(n as i32)]).map_err(Into::<error::Error>::into)
+    instance.call("hello_wasm", &[Value::I32(n as i32)]).map_err(Into::<Box<error::Error>>::into)
 }
 
 fn main() -> error::Result<()> {
