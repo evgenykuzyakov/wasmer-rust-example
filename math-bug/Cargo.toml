@@ -8,8 +8,8 @@ edition = "2018"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+uint =  { version = "0.8.3", default-features = false }
 wee_alloc = { version = "0.4.5", default-features = false, features = [] }
-crunchy = { version = "0.2.2", default-features = false }
 
 [profile.release]
 codegen-units = 1

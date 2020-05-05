@@ -1,11 +1,7 @@
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-mod uint;
-pub use crunchy::unroll;
-
-#[doc(hidden)]
-pub use core as core_;
+use uint::construct_uint;
 
 construct_uint! {
     /// 256-bit unsigned integer.
