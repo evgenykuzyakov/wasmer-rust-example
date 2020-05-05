@@ -1,8 +1,10 @@
 [package]
-name = "rust_embedder_app"
+name = "wasmer-run"
 version = "0.1.0"
-authors = ["Brandon Fish <brandon.j.fish@gmail.com>"]
+authors = ["Evgeny Kuzyakov <ek@nearprotocol.com>"]
 edition = "2018"
 
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
 [dependencies]
-wasmer-runtime = "0.1.2"
+wasmer-runtime = { version = "0.13.1", features = ["default-backend-singlepass"], default-features = false }
